@@ -1,5 +1,8 @@
 package backend;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class BattleFieldSolver {
@@ -9,9 +12,24 @@ public class BattleFieldSolver {
 		battleFieldsVisited = new ArrayList<BattleField>();
 	}
 
-	public void solve(BattleField battleField,int steps) {
+	public void solve(BattleField battleField,int steps,ArrayList<Move> moves) {
 		if (battleField.isSolved()) {
 			System.out.println(battleField.toString()+"Steps: "+Integer.toString(steps)+"\n");
+			FileWriter fileWriter=null;
+			try {
+				fileWriter=new FileWriter(new File(Integer.toHexString(System.identityHashCode(battleField))));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			for(Move move:moves){
+				try {
+					fileWriter.write(move.toString()+"\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			
 		} else {
 			AtomBlock empty1 = battleField.getEmpty1();
@@ -30,7 +48,9 @@ public class BattleFieldSolver {
 						battleFieldsVisited.add(battleField.copy());
 						BattleField battleFieldTemp=battleField.copy();
 						move.unmove();
-						solve(battleFieldTemp,steps+1);
+						ArrayList<Move> tempList=(ArrayList<Move>) moves.clone();
+						tempList.add(move);
+						solve(battleFieldTemp,steps+1,tempList);
 					} else {
 						move.unmove();
 					}
